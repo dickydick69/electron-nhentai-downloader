@@ -20,12 +20,12 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 480, height: 854, resizable: false });
-  if(isDev){
+  if (isDev) {
     mainWindow.loadURL('http://localhost:3000');
   } else {
     mainWindow.loadFile(`${path.join(__dirname, '../build/index.html')}`);
   }
-  
+
   if (isDev) {
     // Open the DevTools.
     BrowserWindow.addDevToolsExtension(`${homedir}/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0`);
@@ -51,7 +51,13 @@ app.on('activate', () => {
 });
 
 ipcMain.on('get-current-download-path', event => {
-  event.sender.send('download-path', downloadPath)
+  const desiredMode = 0o2775
+  const options = {
+    mode: 0o2775
+  }
+  fs.ensureDir(downloadPath,desiredMode).then(() => {
+    event.sender.send('download-path', downloadPath)
+  })
 })
 
 ipcMain.on('download', (event, links, data) => {
@@ -90,7 +96,7 @@ ipcMain.on('download', (event, links, data) => {
 ipcMain.on('open-dialog', event => {
   let options = { properties: ["openDirectory"] }
   dialog.showOpenDialog(options, (dir) => {
-    if(dir) {
+    if (dir) {
       downloadPath = dir
       event.sender.send('download-path', downloadPath)
     }

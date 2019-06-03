@@ -7,7 +7,7 @@ class DownloadList extends Component {
     render() {
         const {doujinList} = this.props
         return (
-            <Card className="mt-3" style={{ height: '62vh', maxHeight: '62vh', overflowY: 'auto' }}>
+            <Card className="mt-3" style={{ height: '60vh', maxHeight: '60vh', overflowY: 'auto' }}>
                 <Card.Body>
                     <ListGroup variant="flush">
                         {
