@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Card, Button, Form, FormControl } from 'react-bootstrap'
 import { connect } from 'react-redux'
-import { getDownloadPath,fetchDoujin } from '../actions/downloadAction'
+import { getDownloadPath, fetchDoujin } from '../actions/downloadAction'
 import { ipcRenderer } from 'electron'
 
 class Download extends Component {
@@ -17,7 +17,12 @@ class Download extends Component {
 
     onSubmit = e => {
         e.preventDefault()
-        this.props.fetchDoujin(this.state.id)
+        if (!this.props.doujinList.some(list => list.id == this.state.id)) {
+            this.props.fetchDoujin(this.state.id)
+        }
+        this.setState({
+            id: ''
+        })
     }
 
     componentDidMount() {
@@ -38,7 +43,7 @@ class Download extends Component {
                         <Button type="submit" block variant="outline-danger" className="mt-2">Download</Button>
                     </Form>
                     <div className="font-italic text-center mt-1">
-                        Current Download Path: 
+                        Current Download Path:
                         <br /> {this.props.downloadPath}
                     </div>
                 </Card.Body>
@@ -48,7 +53,8 @@ class Download extends Component {
 }
 
 const mapStateToProps = state => ({
-    downloadPath: state.download.downloadPath
+    downloadPath: state.download.downloadPath,
+    doujinList: state.download.doujinList
 })
 
-export default connect(mapStateToProps, { getDownloadPath,fetchDoujin })(Download)
+export default connect(mapStateToProps, { getDownloadPath, fetchDoujin })(Download)

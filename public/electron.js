@@ -39,6 +39,7 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
+  // fs.remove(tempDir)
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -55,20 +56,23 @@ ipcMain.on('get-current-download-path', event => {
   const options = {
     mode: 0o2775
   }
-  fs.ensureDir(downloadPath,desiredMode).then(() => {
+  fs.ensureDir(downloadPath, desiredMode).then(() => {
     event.sender.send('download-path', downloadPath)
   })
 })
 
-ipcMain.on('download', (event, links, data) => {
+ipcMain.on('download', async (event, links, data) => {
   const length = links.length;
   let counter = 0
   const title = data.title.pretty.replace(/[\\\/\:\*\?\"\<\>\|]/, "")
+  const desiredMode = 0o2775
+  await fs.ensureDir(downloadPath.toString(), desiredMode)
   for (let i = 0; i < length; i++) {
     DownloadManager.download({
       url: links[i],
       path: title
     }, (error, info) => {
+      console.log(`Done: ${info.url}`)
       counter += 1;
       let percentage = Math.floor(((counter / length) * 100) - 5)
       event.sender.send('download-progress', percentage, data.id)
